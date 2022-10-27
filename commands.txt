@@ -1,0 +1,16 @@
+make_dataset:
+- python data/make_dataset.py '../data/raw/train.csv' '../data/processed/train.pkl' '../data/processed/target.pkl'
+- python data/make_dataset.py '../data/raw/test.csv' '../data/processed/test.pkl' ' '
+- dvc stage add -n final_preprocess_data -d ../data/raw -o ../data/processed python data/make_dataset.py '../data/raw/train.csv' '../data/processed/train.pkl' '../data/processed/target.pkl'; python data/make_dataset.py '../data/raw/test.csv' '../data/processed/test.pkl' ' '
+
+train:
+- python models/train_model.py '../data/processed/train.pkl' '../data/processed/target.pkl' '../models'
+- dvc stage add -n train_catboost -d ../data/processed -o ../models python models/train_model.py '../data/processed/train.pkl' '../data/processed/target.pkl' '../models'
+
+predict:
+- python models/predict_model.py '../models' '../data/processed/test.pkl'
+- dvc stage add -n evaluate_catboost -d ../models -o submission.csv python models/predict_model.py '../models' '../data/processed/test.pkl'
+
+
+
+
